@@ -1,0 +1,22 @@
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+
+<body>
+    <div class="App">
+        <header class="App-header">
+            <img src="{{ url_for('static', filename='Octocat.png') }}" class="App-logo" alt="logo" />
+            <p>
+                Flask Storage Service is running!
+            </p>
+            <p class="small">
+                Go to <code>/add</code> to add files and <code>/get?filename=YOUR_FILENAME</code> to retrieve files.
+            </p>
+            <p class="small">
+                First fetch an api key ;P
+            </p>
+        </header>
+    </div>
+</body>
+
+</html>

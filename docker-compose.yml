@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  flask-file-storage:
+    build: .
+    container_name: flask-file-storage
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      # Persistent data storage
+      - ./data:/app/data
+      # Persistent API keys
+      - ./config:/app/config
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    networks:
+      - flask-network
+
+networks:
+  flask-network:
+    driver: bridge
+
+volumes:
+  data:
+  config:

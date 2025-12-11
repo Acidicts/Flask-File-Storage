@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 1400px;
+            width: 100%;
+        }
+        
+        .login-container {
+            max-width: 400px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        input[type="text"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            background: #e74c3c;
+            font-size: 14px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            background: #27ae60;
+            font-size: 14px;
+        }
+        
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .file-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border-color: #2563eb;
+        }
+        
+        .file-card-actions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+        
+        .file-card:hover .file-card-actions {
+            opacity: 1;
+        }
+        
+        .file-action-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .file-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .file-action-btn.delete {
+            color: #e74c3c;
+        }
+        
+        .file-action-btn.delete:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .file-preview {
+            width: 100%;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ebf0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .file-icon-large {
+            font-size: 64px;
+            opacity: 0.8;
+        }
+        
+        .file-type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .file-size {
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            grid-column: 1 / -1;
+        }
+        
+        .stats {
+            background: #f0f2f5;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-top: 5px;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80%;
+        }
+        
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .modal-body {
+            padding: 0;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            gap: 0;
+        }
+        
+        .preview-panel {
+            flex: 0 0 45%;
+            background: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e0e0e0;
+            min-height: 500px;
+        }
+        
+        .details-panel {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        
+        .detail-section h3 {
+            color: #2563eb;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        
+        .detail-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .detail-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e8e9ea;
+            transition: background 0.2s;
+        }
+        
+        .detail-list-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .detail-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 600;
+            min-width: 140px;
+        }
+        
+        .detail-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            word-break: break-word;
+            text-align: right;
+            flex: 1;
+        }
+        
+        .detail-value.highlight {
+            color: #2563eb;
+            font-weight: 700;
+        }
+        
+        .preview-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .preview-controls {
+            background: #fff;
+            padding: 12px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .preview-controls button {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-secondary {
+            background: #7f8c8d;
+        }
+        
+        .btn-info {
+            background: #3498db;
+        }
+        
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border: none;
+            resize: none;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+        }
+        
+        .iframe-viewer {
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            border: none;
+            background: white;
+        }
+        
+        .image-viewer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .image-viewer img:hover {
+            transform: scale(1.02);
+        }
+        
+        .preview-placeholder {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+        }
+        
+        .preview-placeholder .icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* Fullscreen overlay for focused preview */
+        .focus-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .focus-overlay.active {
+            display: flex;
+        }
+        
+        .focus-overlay img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .focus-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        
+        .focus-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(3, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        /* Delete animation */
+        @keyframes deleteFile {
+            0% {
+                transform: translateY(0) scale(1) rotateZ(0deg);
+                opacity: 1;
+            }
+            15% {
+                transform: translateY(-20px) scale(1.1) rotateZ(-3deg);
+            }
+            30% {
+                transform: translateY(0) scale(1.05) rotateZ(3deg);
+            }
+            40% {
+                transform: translateY(-10px) scale(1.02) rotateZ(-2deg);
+            }
+            50% {
+                transform: translateY(0) scale(1) rotateZ(0deg);
+            }
+            65% {
+                transform: translateY(20px) scale(0.95) rotateZ(5deg);
+                opacity: 1;
+            }
+            80% {
+                transform: translateY(100px) scale(0.7) rotateZ(15deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(150px) scale(0.3) rotateZ(25deg);
+                opacity: 0;
+            }
+        }
+        
+        .file-card.deleting {
+            animation: deleteFile 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            pointer-events: none;
+        }
+        
+        /* Toast animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        /* Dialog styles */
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dialog-overlay.active {
+            display: flex;
+        }
+        
+        .dialog-box {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .dialog-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        
+        .dialog-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        .dialog-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .dialog-actions button {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background: #e8e9ea;
+            border-color: #2563eb;
+        }
+        
+        .file-input-label.has-file {
+            background: #dbeafe;
+            border-color: #2563eb;
+            border-style: solid;
+        }
+        
+        /* API Key Management Styles */
+        .api-key-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .api-key-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+        
+        .api-key-card.current {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .api-key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .api-key-type.permanent {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .api-key-type.temporary {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .api-key-type.current {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .api-key-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #374151;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .api-key-info {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .key-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .key-btn.view {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .key-btn.copy {
+            background: #10b981;
+            color: white;
+        }
+        
+        .key-btn.delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .key-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .key-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .expiry-warning {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        .expiry-info {
+            color: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container {% if not logged_in %}login-container{% endif %}">
+        {% if not logged_in %}
+            <!-- Login Form -->
+            <h1>🔐 Panel Login</h1>
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+            <form class="login-form" method="POST" action="{{ url_for('panel.login') }}">
+                <div class="form-group">
+                    <label for="api_key">API Key</label>
+                    <input type="text" id="api_key" name="api_key" placeholder="Enter your API key" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        {% else %}
+            <!-- File Panel -->
+            <div class="header">
+                <h1>📁 File Panel</h1>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="openApiKeysDialog()" class="action-btn">🔑 API Keys</button>
+                    <button onclick="openUploadDialog()" class="action-btn">📤 Upload File</button>
+                    <button onclick="openCreateFolderDialog()" class="action-btn">📁 New Folder</button>
+                    <form action="{{ url_for('panel.logout') }}" method="GET" style="margin: 0;">
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total Items</span>
+                    <span class="stat-value">{{ files|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Files</span>
+                    <span class="stat-value">{{ files|selectattr('is_dir', 'equalto', False)|list|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Folders</span>
+                    <span class="stat-value">{{ files|selectattr('is_dir', 'equalto', True)|list|length }}</span>
+                </div>
+            </div>
+            
+            <div class="file-grid">
+                {% if files %}
+                    {% for file in files %}
+                        <div class="file-card" onclick="openFileDetails('{{ file.name }}', '{{ file.file_type }}')" data-filename="{{ file.name }}">
+                            <div class="file-card-actions">
+                                <button class="file-action-btn delete" onclick="event.stopPropagation(); deleteFile('{{ file.name }}')" title="Delete">🗑️</button>
+                            </div>
+                            <div class="file-preview">
+                                {% if file.file_type == 'image' %}
+                                    <img src="{{ url_for('panel.preview_file', filename=file.name) }}" alt="{{ file.name }}" loading="lazy">
+                                {% elif file.file_type == 'python' %}
+                                    <div class="file-icon-large" style="color: #3776ab;">🐍</div>
+                                    <div class="file-type-badge" style="color: #3776ab; border: 1px solid #3776ab;">Python</div>
+                                {% elif file.file_type == 'html' %}
+                                    <div class="file-icon-large" style="color: #e34c26;">🌐</div>
+                                    <div class="file-type-badge" style="color: #e34c26; border: 1px solid #e34c26;">HTML</div>
+                                {% elif file.file_type == 'css' %}
+                                    <div class="file-icon-large" style="color: #264de4;">🎨</div>
+                                    <div class="file-type-badge" style="color: #264de4; border: 1px solid #264de4;">CSS</div>
+                                {% elif file.file_type == 'javascript' %}
+                                    <div class="file-icon-large" style="color: #f7df1e;">⚡</div>
+                                    <div class="file-type-badge" style="color: #000; background: #f7df1e; border: 1px solid #f7df1e;">JavaScript</div>
+                                {% elif file.file_type == 'json' %}
+                                    <div class="file-icon-large" style="color: #555;">{ }</div>
+                                    <div class="file-type-badge" style="color: #555; border: 1px solid #555;">JSON</div>
+                                {% elif file.file_type == 'markdown' %}
+                                    <div class="file-icon-large" style="color: #083fa1;">📝</div>
+                                    <div class="file-type-badge" style="color: #083fa1; border: 1px solid #083fa1;">Markdown</div>
+                                {% elif file.file_type == 'pdf' %}
+                                    <div class="file-icon-large" style="color: #f40f02;">📕</div>
+                                    <div class="file-type-badge" style="color: #f40f02; border: 1px solid #f40f02;">PDF</div>
+                                {% elif file.file_type == 'archive' %}
+                                    <div class="file-icon-large" style="color: #e89f26;">📦</div>
+                                    <div class="file-type-badge" style="color: #e89f26; border: 1px solid #e89f26;">Archive</div>
+                                {% elif file.file_type == 'video' %}
+                                    <div class="file-icon-large" style="color: #ff4757;">🎬</div>
+                                    <div class="file-type-badge" style="color: #ff4757; border: 1px solid #ff4757;">Video</div>
+                                {% elif file.file_type == 'audio' %}
+                                    <div class="file-icon-large" style="color: #5f27cd;">🎵</div>
+                                    <div class="file-type-badge" style="color: #5f27cd; border: 1px solid #5f27cd;">Audio</div>
+                                {% elif file.file_type == 'word' %}
+                                    <div class="file-icon-large" style="color: #2b579a;">📘</div>
+                                    <div class="file-type-badge" style="color: #2b579a; border: 1px solid #2b579a;">Word</div>
+                                {% elif file.file_type == 'excel' %}
+                                    <div class="file-icon-large" style="color: #217346;">📊</div>
+                                    <div class="file-type-badge" style="color: #217346; border: 1px solid #217346;">Excel</div>
+                                {% elif file.file_type == 'java' %}
+                                    <div class="file-icon-large" style="color: #f89820;">☕</div>
+                                    <div class="file-type-badge" style="color: #f89820; border: 1px solid #f89820;">Java</div>
+                                {% elif file.file_type == 'typescript' %}
+                                    <div class="file-icon-large" style="color: #3178c6;">TS</div>
+                                    <div class="file-type-badge" style="color: #3178c6; border: 1px solid #3178c6;">TypeScript</div>
+                                {% elif file.file_type == 'react' %}
+                                    <div class="file-icon-large" style="color: #61dafb;">⚛️</div>
+                                    <div class="file-type-badge" style="color: #61dafb; border: 1px solid #61dafb;">React</div>
+                                {% elif file.file_type == 'php' %}
+                                    <div class="file-icon-large" style="color: #777bb4;">🐘</div>
+                                    <div class="file-type-badge" style="color: #777bb4; border: 1px solid #777bb4;">PHP</div>
+                                {% elif file.file_type == 'database' %}
+                                    <div class="file-icon-large" style="color: #f29111;">🗄️</div>
+                                    <div class="file-type-badge" style="color: #f29111; border: 1px solid #f29111;">SQL</div>
+                                {% elif file.is_dir %}
+                                    <div class="file-icon-large" style="color: #ffd700;">📁</div>
+                                    <div class="file-type-badge" style="color: #ffd700; border: 1px solid #ffd700;">Folder</div>
+                                {% else %}
+                                    <div class="file-icon-large" style="color: #95a5a6;">📄</div>
+                                    <div class="file-type-badge" style="color: #95a5a6; border: 1px solid #95a5a6;">File</div>
+                                {% endif %}
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name" title="{{ file.name }}">{{ file.name }}</div>
+                                <div class="file-size">
+                                    {% if file.size is not none %}
+                                        {% if file.size < 1024 %}
+                                            {{ file.size }} B
+                                        {% elif file.size < 1048576 %}
+                                            {{ "%.2f"|format(file.size / 1024) }} KB
+                                        {% else %}
+                                            {{ "%.2f"|format(file.size / 1048576) }} MB
+                                        {% endif %}
+                                    {% else %}
+                                        Folder
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>📭 No files or folders found</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- File Details Modal -->
+            <div class="modal-overlay" id="fileModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="modalFileName">File Details</h2>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="preview-panel" id="previewPanel">
+                            <div class="preview-content" id="previewContent">
+                                <div class="loading">Loading preview</div>
+                            </div>
+                            <div class="preview-controls" id="previewControls" style="display: none;"></div>
+                        </div>
+                        <div class="details-panel" id="detailsPanel">
+                            <div class="loading">Loading details</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Focus Overlay for images -->
+            <div class="focus-overlay" id="focusOverlay">
+                <button class="focus-close" onclick="closeFocus()">&times;</button>
+                <img id="focusImage" src="" alt="">
+            </div>
+            
+            <!-- Upload Dialog -->
+            <div class="dialog-overlay" id="uploadDialog">
+                <div class="dialog-box">
+                    <h3 class="dialog-title">📤 Upload File</h3>
+                    <form id="uploadForm" onsubmit="uploadFile(event)">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" onchange="updateFileLabel()" required>
+                            <label for="fileInput" class="file-input-label" id="fileLabel">
+                                <div>📁 Click to select a file</div>
+                                <div style="font-size: 12px; color: #888; margin-top: 5px;">or drag and drop</div>
+                            </label>
+                        </div>
+                        <div class="dialog-actions">
+                            <button type="button" onclick="closeUploadDialog()" class="btn-secondary">Cancel</button>
+                            <button type="submit" class="btn-success">Upload</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Create Folder Dialog -->
+            <div class="dialog-overlay" id="createFolderDialog">
+                <div class="dialog-box">
+                    <h3 class="dialog-title">📁 Create New Folder</h3>
+                    <form id="createFolderForm" onsubmit="createFolder(event)">
+                        <input type="text" id="folderNameInput" class="dialog-input" placeholder="Enter folder name" required>
+                        <div class="dialog-actions">
+                            <button type="button" onclick="closeCreateFolderDialog()" class="btn-secondary">Cancel</button>
+                            <button type="submit" class="btn-success">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- API Keys Management Dialog -->
+            <div class="dialog-overlay" id="apiKeysDialog">
+                <div class="dialog-box" style="max-width: 800px;">
+                    <h3 class="dialog-title">🔑 API Key Management</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="showCreateKeyForm()" class="btn-success" style="margin-right: 10px;">➕ Create New Key</button>
+                        <button onclick="refreshApiKeys()" class="btn-info">🔄 Refresh</button>
+                    </div>
+                    
+                    <!-- Create Key Form (Hidden by default) -->
+                    <div id="createKeyForm" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+                        <h4 style="margin-top: 0;">Create New API Key</h4>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Key Type</label>
+                            <select id="keyType" class="dialog-input" onchange="toggleExpiryInput()">
+                                <option value="permanent">Permanent</option>
+                                <option value="temporary">Temporary</option>
+                            </select>
+                        </div>
+                        <div id="expiryInput" style="display: none; margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Expiration Date & Time</label>
+                            <input type="datetime-local" id="keyExpiry" class="dialog-input" required>
+                            <small style="color: #6b7280; display: block; margin-top: 5px;">Select when this API key should expire</small>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="createApiKey()" class="btn-success">Create</button>
+                            <button onclick="hideCreateKeyForm()" class="btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Keys List -->
+                    <div id="apiKeysList" style="max-height: 400px; overflow-y: auto;">
+                        <div class="loading">Loading API keys...</div>
+                    </div>
+                    
+                    <div class="dialog-actions" style="margin-top: 20px;">
+                        <button onclick="closeApiKeysDialog()" class="btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Key Details Dialog -->
+            <div class="dialog-overlay" id="keyDetailsDialog">
+                <div class="dialog-box" style="max-width: 600px;">
+                    <h3 class="dialog-title">🔑 API Key Details</h3>
+                    <div id="keyDetailsContent"></div>
+                    <div class="dialog-actions">
+                        <button onclick="closeKeyDetailsDialog()" class="btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if logged_in %}
+    <script>
+        let currentFilename = '';
+        let isEditing = false;
+        let originalContent = '';
+        
+        function openFileDetails(filename, fileType) {
+            currentFilename = filename;
+            document.getElementById('modalFileName').textContent = filename;
+            document.getElementById('fileModal').classList.add('active');
+            document.getElementById('previewContent').innerHTML = '<div class="loading">Loading preview</div>';
+            document.getElementById('detailsPanel').innerHTML = '<div class="loading">Loading details</div>';
+            document.getElementById('previewControls').style.display = 'none';
+            
+            fetch(`/panel/file-details/${encodeURIComponent(filename)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayFileDetails(data);
+                })
+                .catch(error => {
+                    document.getElementById('detailsPanel').innerHTML = 
+                        `<div class="error">Error loading file details: ${error.message}</div>`;
+                });
+        }
+        
+        function closeModal() {
+            if (isEditing) {
+                if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+                    return;
+                }
+            }
+            document.getElementById('fileModal').classList.remove('active');
+            isEditing = false;
+        }
+        
+        function displayFileDetails(data) {
+            const previewContent = document.getElementById('previewContent');
+            const detailsPanel = document.getElementById('detailsPanel');
+            const previewControls = document.getElementById('previewControls');
+            
+            // Build details list
+            let detailsHtml = `
+                <div class="detail-section">
+                    <h3>📊 File Information</h3>
+                    <ul class="detail-list">
+                        <li class="detail-list-item">
+                            <span class="detail-label">File Name</span>
+                            <span class="detail-value highlight">${data.name}</span>
+                        </li>
+                        <li class="detail-list-item">
+                            <span class="detail-label">File Type</span>
+                            <span class="detail-value">${data.file_type.toUpperCase()}</span>
+                        </li>
+                        <li class="detail-list-item">
+                            <span class="detail-label">Extension</span>
+                            <span class="detail-value">${data.extension || 'None'}</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>💾 Size Information</h3>
+                    <ul class="detail-list">
+                        <li class="detail-list-item">
+                            <span class="detail-label">Bytes (Raw)</span>
+                            <span class="detail-value highlight">${data.size_bytes.toLocaleString()} B</span>
+                        </li>
+                        <li class="detail-list-item">
+                            <span class="detail-label">Bytes (Formatted)</span>
+                            <span class="detail-value">${data.size_bytes_formatted}</span>
+                        </li>
+                        <li class="detail-list-item">
+                            <span class="detail-label">Bits (Raw)</span>
+                            <span class="detail-value highlight">${data.size_bits.toLocaleString()} b</span>
+                        </li>
+                        <li class="detail-list-item">
+                            <span class="detail-label">Bits (Formatted)</span>
+                            <span class="detail-value">${data.size_bits_formatted}</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>📅 Timestamps</h3>
+                    <ul class="detail-list">
+                        <li class="detail-list-item">
+                            <span class="detail-label">Modified</span>
+                            <span class="detail-value">${new Date(data.modified * 1000).toLocaleString()}</span>
+                        </li>
+                        <li class="detail-list-item">
+                            <span class="detail-label">Created</span>
+                            <span class="detail-value">${new Date(data.created * 1000).toLocaleString()}</span>
+                        </li>
+                    </ul>
+                </div>
+            `;
+            
+            // Image metadata
+            if (data.image_metadata && !data.image_metadata.error) {
+                detailsHtml += `
+                    <div class="detail-section">
+                        <h3>🖼️ Image Metadata</h3>
+                        <ul class="detail-list">
+                            <li class="detail-list-item">
+                                <span class="detail-label">Dimensions</span>
+                                <span class="detail-value highlight">${data.image_metadata.width} × ${data.image_metadata.height} px</span>
+                            </li>
+                            <li class="detail-list-item">
+                                <span class="detail-label">Format</span>
+                                <span class="detail-value">${data.image_metadata.format}</span>
+                            </li>
+                            <li class="detail-list-item">
+                                <span class="detail-label">Color Mode</span>
+                                <span class="detail-value">${data.image_metadata.mode}</span>
+                            </li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            detailsPanel.innerHTML = detailsHtml;
+            
+            // Build preview
+            let previewHtml = '';
+            let controlsHtml = '';
+            
+            if (data.file_type === 'image') {
+                previewHtml = `
+                    <div class="image-viewer">
+                        <img src="/panel/preview/${encodeURIComponent(data.name)}" 
+                             alt="${data.name}"
+                             onclick="focusImage(this.src)"
+                             title="Click to focus">
+                    </div>
+                `;
+                controlsHtml = `<button class="btn-info" onclick="focusImage('/panel/preview/${encodeURIComponent(data.name)}')">🔍 Focus Image</button>`;
+            } else if (data.file_type === 'html') {
+                previewHtml = `
+                    <div class="preview-placeholder">
+                        <div class="icon">🌐</div>
+                        <p>HTML File</p>
+                    </div>
+                `;
+                controlsHtml = `
+                    <button onclick="openInIframe()" id="openIframeBtn">📱 Open in Frame</button>
+                    <button onclick="closeIframe()" class="btn-secondary" style="display:none;" id="closeIframeBtn">⬅️ Back</button>
+                `;
+            } else if (data.is_editable) {
+                previewHtml = `<textarea class="code-editor" id="fileEditor" readonly></textarea>`;
+                controlsHtml = `
+                    <button onclick="enableEditing()" id="editBtn">✏️ Edit File</button>
+                    <button onclick="saveFile()" class="btn-success" style="display:none;" id="saveBtn">💾 Save</button>
+                    <button onclick="cancelEditing()" class="btn-secondary" style="display:none;" id="cancelBtn">❌ Cancel</button>
+                `;
+            } else {
+                previewHtml = `
+                    <div class="preview-placeholder">
+                        <div class="icon">📄</div>
+                        <p>Preview not available</p>
+                        <p style="font-size: 12px; color: #aaa; margin-top: 10px;">This file type cannot be previewed</p>
+                    </div>
+                `;
+            }
+            
+            previewContent.innerHTML = previewHtml;
+            
+            if (controlsHtml) {
+                previewControls.innerHTML = controlsHtml;
+                previewControls.style.display = 'flex';
+            } else {
+                previewControls.style.display = 'none';
+            }
+            
+            // Load content for editable files
+            if (data.is_editable) {
+                loadFileContent();
+            }
+        }
+        
+        function loadFileContent() {
+            fetch(`/panel/file-content/${encodeURIComponent(currentFilename)}`)
+                .then(response => response.text())
+                .then(content => {
+                    originalContent = content;
+                    document.getElementById('fileEditor').value = content;
+                })
+                .catch(error => {
+                    console.error('Error loading file content:', error);
+                });
+        }
+        
+        function enableEditing() {
+            const editor = document.getElementById('fileEditor');
+            editor.removeAttribute('readonly');
+            editor.style.background = '#2d2d2d';
+            editor.style.cursor = 'text';
+            isEditing = true;
+            
+            document.getElementById('editBtn').style.display = 'none';
+            document.getElementById('saveBtn').style.display = 'inline-block';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+        }
+        
+        function cancelEditing() {
+            const editor = document.getElementById('fileEditor');
+            editor.value = originalContent;
+            editor.setAttribute('readonly', 'readonly');
+            editor.style.background = '#1e1e1e';
+            editor.style.cursor = 'default';
+            isEditing = false;
+            
+            document.getElementById('editBtn').style.display = 'inline-block';
+            document.getElementById('saveBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+        
+        function saveFile() {
+            const content = document.getElementById('fileEditor').value;
+            
+            fetch(`/panel/save-file/${encodeURIComponent(currentFilename)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ File saved successfully!');
+                    originalContent = content;
+                    cancelEditing();
+                } else {
+                    alert('❌ Error saving file: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error saving file: ' + error.message);
+            });
+        }
+        
+        function openInIframe() {
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <iframe class="iframe-viewer" src="/panel/preview/${encodeURIComponent(currentFilename)}"></iframe>
+            `;
+            document.getElementById('openIframeBtn').style.display = 'none';
+            document.getElementById('closeIframeBtn').style.display = 'inline-block';
+        }
+        
+        function closeIframe() {
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <div class="preview-placeholder">
+                    <div class="icon">🌐</div>
+                    <p>HTML File</p>
+                </div>
+            `;
+            document.getElementById('openIframeBtn').style.display = 'inline-block';
+            document.getElementById('closeIframeBtn').style.display = 'none';
+        }
+        
+        function focusImage(src) {
+            document.getElementById('focusImage').src = src;
+            document.getElementById('focusOverlay').classList.add('active');
+        }
+        
+        function closeFocus() {
+            document.getElementById('focusOverlay').classList.remove('active');
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('focusOverlay').classList.contains('active')) {
+                    closeFocus();
+                } else {
+                    closeModal();
+                }
+            }
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('fileModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Close focus overlay when clicking on it
+        document.getElementById('focusOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFocus();
+            }
+        });
+        
+        // Upload file functions
+        function openUploadDialog() {
+            document.getElementById('uploadDialog').classList.add('active');
+            document.getElementById('fileInput').value = '';
+            updateFileLabel();
+        }
+        
+        function closeUploadDialog() {
+            document.getElementById('uploadDialog').classList.remove('active');
+        }
+        
+        function updateFileLabel() {
+            const input = document.getElementById('fileInput');
+            const label = document.getElementById('fileLabel');
+            
+            if (input.files.length > 0) {
+                const fileName = input.files[0].name;
+                const fileSize = (input.files[0].size / 1024).toFixed(2);
+                label.innerHTML = `
+                    <div>✅ ${fileName}</div>
+                    <div style="font-size: 12px; color: #888; margin-top: 5px;">${fileSize} KB</div>
+                `;
+                label.classList.add('has-file');
+            } else {
+                label.innerHTML = `
+                    <div>📁 Click to select a file</div>
+                    <div style="font-size: 12px; color: #888; margin-top: 5px;">or drag and drop</div>
+                `;
+                label.classList.remove('has-file');
+            }
+        }
+        
+        function uploadFile(event) {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+            
+            if (fileInput.files.length === 0) {
+                alert('Please select a file');
+                return;
+            }
+            
+            formData.append('file', fileInput.files[0]);
+            
+            fetch('/panel/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ File uploaded successfully!');
+                    closeUploadDialog();
+                    location.reload(); // Refresh to show new file
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Upload failed: ' + error.message);
+            });
+        }
+        
+        // Create folder functions
+        function openCreateFolderDialog() {
+            document.getElementById('createFolderDialog').classList.add('active');
+            document.getElementById('folderNameInput').value = '';
+            document.getElementById('folderNameInput').focus();
+        }
+        
+        function closeCreateFolderDialog() {
+            document.getElementById('createFolderDialog').classList.remove('active');
+        }
+        
+        function createFolder(event) {
+            event.preventDefault();
+            
+            const folderName = document.getElementById('folderNameInput').value.trim();
+            
+            if (!folderName) {
+                alert('Please enter a folder name');
+                return;
+            }
+            
+            fetch('/panel/create-folder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ folder_name: folderName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Folder created successfully!');
+                    closeCreateFolderDialog();
+                    location.reload(); // Refresh to show new folder
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Failed to create folder: ' + error.message);
+            });
+        }
+        
+        // Delete file function
+        function deleteFile(filename) {
+            if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+                return;
+            }
+            
+            // Find the file card element
+            const fileCards = document.querySelectorAll('.file-card');
+            let targetCard = null;
+            
+            fileCards.forEach(card => {
+                if (card.getAttribute('data-filename') === filename) {
+                    targetCard = card;
+                }
+            });
+            
+            if (targetCard) {
+                // Add deleting animation class
+                targetCard.classList.add('deleting');
+                
+                // Wait for animation to complete before making API call
+                setTimeout(() => {
+                    fetch(`/panel/delete/${encodeURIComponent(filename)}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the card from DOM
+                            targetCard.remove();
+                            
+                            // Update stats
+                            const totalItems = document.querySelectorAll('.file-card').length;
+                            const statValues = document.querySelectorAll('.stat-value');
+                            if (statValues[0]) statValues[0].textContent = totalItems;
+                            
+                            // Show subtle success message
+                            showToast('✅ File deleted successfully!');
+                        } else {
+                            // Remove animation and show error
+                            targetCard.classList.remove('deleting');
+                            alert('❌ Error: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        targetCard.classList.remove('deleting');
+                        alert('❌ Failed to delete: ' + error.message);
+                    });
+                }, 800); // Match animation duration
+            }
+        }
+        
+        // Toast notification function
+        function showToast(message) {
+            const existingToast = document.getElementById('toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+        
+        // Drag and drop for file upload
+        const fileLabel = document.getElementById('fileLabel');
+        
+        fileLabel.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.background = '#d4e6ff';
+        });
+        
+        fileLabel.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            if (document.getElementById('fileInput').files.length === 0) {
+                this.style.background = '#f8f9fa';
+            }
+        });
+        
+        fileLabel.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.background = '#e7f3ff';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('fileInput').files = files;
+                updateFileLabel();
+            }
+        });
+        
+        // API Key Management Functions
+        function openApiKeysDialog() {
+            document.getElementById('apiKeysDialog').classList.add('active');
+            hideCreateKeyForm();
+            refreshApiKeys();
+        }
+        
+        function closeApiKeysDialog() {
+            document.getElementById('apiKeysDialog').classList.remove('active');
+        }
+        
+        function showCreateKeyForm() {
+            document.getElementById('createKeyForm').style.display = 'block';
+        }
+        
+        function hideCreateKeyForm() {
+            document.getElementById('createKeyForm').style.display = 'none';
+            document.getElementById('keyType').value = 'permanent';
+            document.getElementById('keyExpiry').value = '';
+            toggleExpiryInput();
+        }
+        
+        function toggleExpiryInput() {
+            const keyType = document.getElementById('keyType').value;
+            const expiryInput = document.getElementById('expiryInput');
+            expiryInput.style.display = keyType === 'temporary' ? 'block' : 'none';
+        }
+        
+        function refreshApiKeys() {
+            document.getElementById('apiKeysList').innerHTML = '<div class="loading">Loading API keys...</div>';
+            
+            fetch('/panel/api-keys')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.api_keys) {
+                        displayApiKeys(data.api_keys);
+                    } else {
+                        document.getElementById('apiKeysList').innerHTML = 
+                            '<div style="text-align: center; padding: 20px; color: #888;">No API keys found</div>';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('apiKeysList').innerHTML = 
+                        '<div class="error">Error loading API keys: ' + error.message + '</div>';
+                });
+        }
+        
+        function displayApiKeys(keys) {
+            const container = document.getElementById('apiKeysList');
+            
+            if (keys.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;">No API keys found</div>';
+                return;
+            }
+            
+            let html = '';
+            keys.forEach(key => {
+                const isCurrent = key.is_current;
+                const cardClass = isCurrent ? 'api-key-card current' : 'api-key-card';
+                
+                html += `
+                    <div class="${cardClass}">
+                        <div class="api-key-header">
+                            <div>
+                                <span class="api-key-type ${key.type}">${key.type}</span>
+                                ${isCurrent ? '<span class="api-key-type current" style="margin-left: 5px;">CURRENT</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="api-key-value">
+                            <span>${key.key}</span>
+                        </div>
+                `;
+                
+                if (key.type === 'temporary') {
+                    html += `
+                        <div class="api-key-info expiry-info">
+                            ⏰ Expires in: ${key.expires_in}
+                        </div>
+                    `;
+                }
+                
+                html += `
+                        <div class="api-key-actions">
+                            <button class="key-btn view" onclick='showKeyDetails(${JSON.stringify(key)})'>👁️ View Full</button>
+                            <button class="key-btn copy" onclick='copyKey("${key.full_key}")'>📋 Copy</button>
+                            <button class="key-btn delete" onclick='deleteApiKey("${key.full_key}")' ${isCurrent ? 'disabled title="Cannot delete current key"' : ''}>
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function createApiKey() {
+            const keyType = document.getElementById('keyType').value;
+            const expiry = document.getElementById('keyExpiry').value;
+            
+            const data = {};
+            if (keyType === 'temporary') {
+                if (!expiry) {
+                    alert('Please select an expiration date and time');
+                    return;
+                }
+                
+                const expiryDate = new Date(expiry);
+                const now = new Date();
+                
+                if (expiryDate <= now) {
+                    alert('Expiration date must be in the future');
+                    return;
+                }
+                
+                // Send ISO format datetime
+                data.expiry_datetime = expiryDate.toISOString();
+            }
+            
+            fetch('/panel/api-keys/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ API key created successfully!');
+                    hideCreateKeyForm();
+                    refreshApiKeys();
+                    // Show the new key
+                    showKeyDetails({
+                        full_key: data.api_key,
+                        type: data.temporary ? 'temporary' : 'permanent',
+                        expires_at: data.expires_at
+                    });
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Failed to create API key: ' + error.message);
+            });
+        }
+        
+        function deleteApiKey(key) {
+            if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+                return;
+            }
+            
+            fetch('/panel/api-keys/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ api_key: key })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ API key deleted successfully!');
+                    refreshApiKeys();
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Failed to delete API key: ' + error.message);
+            });
+        }
+        
+        function showKeyDetails(key) {
+            let html = `
+                <div style="background: #f9fafb; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                    <div style="margin-bottom: 15px;">
+                        <strong>Type:</strong> 
+                        <span class="api-key-type ${key.type}">${key.type}</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Full API Key:</strong>
+                        <div class="api-key-value" style="margin-top: 5px;">
+                            <span style="word-break: break-all;">${key.full_key}</span>
+                        </div>
+                        <button class="key-btn copy" onclick='copyKey("${key.full_key}")' style="margin-top: 5px;">📋 Copy to Clipboard</button>
+                    </div>
+            `;
+            
+            if (key.type === 'temporary') {
+                const expiryDate = key.expires_at ? new Date(key.expires_at).toLocaleString() : 'N/A';
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <strong>Expires:</strong> ${expiryDate}
+                    </div>
+                `;
+                if (key.expires_in) {
+                    html += `
+                        <div style="margin-bottom: 15px;">
+                            <strong>Time remaining:</strong> ${key.expires_in}
+                        </div>
+                    `;
+                }
+            }
+            
+            html += `
+                    <div style="padding: 15px; background: #fef3c7; border-radius: 4px; border-left: 4px solid #f59e0b;">
+                        <strong>⚠️ Important:</strong> Store this API key securely. You won't be able to view it again.
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('keyDetailsContent').innerHTML = html;
+            document.getElementById('keyDetailsDialog').classList.add('active');
+        }
+        
+        function closeKeyDetailsDialog() {
+            document.getElementById('keyDetailsDialog').classList.remove('active');
+        }
+        
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                showToast('📋 API key copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy: ' + err);
+            });
+        }
+        
+        // Close dialogs with ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('apiKeysDialog').classList.contains('active')) {
+                    closeApiKeysDialog();
+                } else if (document.getElementById('keyDetailsDialog').classList.contains('active')) {
+                    closeKeyDetailsDialog();
+                } else if (document.getElementById('uploadDialog').classList.contains('active')) {
+                    closeUploadDialog();
+                } else if (document.getElementById('createFolderDialog').classList.contains('active')) {
+                    closeCreateFolderDialog();
+                } else if (document.getElementById('focusOverlay').classList.contains('active')) {
+                    closeFocus();
+                } else {
+                    closeModal();
+                }
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
